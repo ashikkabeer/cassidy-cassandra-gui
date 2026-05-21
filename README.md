@@ -58,6 +58,27 @@ are encrypted at rest with the master key. Reference tables as
 all INSERT/UPDATE/DELETE/DDL through the UI (note: this is an app-layer guard —
 real protection still needs Cassandra-side `GRANT`s).
 
+### Networking: VPN-routed or host-local clusters
+
+Cassidy reaches your cluster from **wherever the Cassidy process runs**, not from
+your browser. That matters when your cluster is only reachable over a VPN or sits
+on the host's `localhost`: a contact point like `10.10.1.26` must be routable from
+inside the container, and **Docker Desktop on macOS/Windows runs containers in a
+Linux VM that does not inherit your host's VPN routes** — so VPN-only internal IPs
+typically fail to connect there.
+
+| Cassidy runs as… | VPN-only internal IPs (e.g. `10.10.1.26`) | Cassandra on the host's own `localhost` |
+|---|---|---|
+| **Native binary** on your machine | ✅ uses your machine's routes/VPN | ✅ `127.0.0.1` |
+| **Docker Desktop** (macOS/Windows) | ❌ usually fails (VM can't see the VPN) | use `host.docker.internal`, not `localhost` |
+| **Docker on Linux** with `--network host` | ✅ shares host routes (incl. VPN) | ✅ `127.0.0.1` |
+| **docker-compose** (own bridge network) | ❌ for VPN IPs | use the service name (e.g. `cassandra`) |
+
+Rules of thumb: if your cluster is reachable **only via a VPN on your machine**, run
+the **native binary** (`make build` → `./dist/cassidy`). Use Docker when Cassidy and
+the cluster are co-located — same Docker network (compose), the same Linux host
+(`--network host`), or a publicly routable address.
+
 ## Environment variables
 
 | Variable | Default | Purpose |
