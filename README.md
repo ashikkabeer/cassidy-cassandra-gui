@@ -113,3 +113,7 @@ services → a pooled-`gocql.Session` Cluster Manager) with metadata in embedded
 SQLite. React + Tailwind + shadcn/ui frontend, embedded via `go:embed`. The
 `apache/cassandra-gocql-driver/v2` driver talks to your clusters; ScyllaDB works
 too (same CQL protocol).
+
+For the full system documentation — architecture, request lifecycle, data model,
+security model, REST API reference, frontend internals, and packaging (with
+diagrams) — see **[DESIGN.md](./DESIGN.md)**.
