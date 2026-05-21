@@ -9,11 +9,20 @@ import {
   Search,
   RefreshCw,
   Plus,
+  Copy,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 import { Skeleton, Spinner } from "@/components/primitives";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import {
   type Keyspace as LiveKeyspace,
   type TableSummary,
@@ -41,6 +50,7 @@ export interface SchemaBrowserProps {
   onToggleKs: (ks: string) => void;
   onToggleTbl: (ks: string, table: string) => void;
   onSelectTable: (ks: string, table: string) => void;
+  onViewRows: (ks: string, table: string) => void;
   onRefresh: () => void;
 }
 
@@ -48,6 +58,9 @@ interface RowDef {
   kind: "ks" | "tbl" | "col" | "h" | "idx";
   label: string;
   depth: number;
+  // Set on table ("tbl") rows so the right-click menu knows the table identity.
+  ks?: string;
+  tableName?: string;
   sub?: string | null;
   icon?: React.ReactNode;
   expanded?: boolean;
@@ -126,6 +139,7 @@ export function SchemaBrowser({
   onToggleKs,
   onToggleTbl,
   onSelectTable,
+  onViewRows,
   onRefresh,
 }: SchemaBrowserProps) {
   const [filter, setFilter] = React.useState("");
@@ -174,6 +188,8 @@ export function SchemaBrowser({
         kind: "tbl",
         label: tbl.name,
         depth: 1,
+        ks: ks.name,
+        tableName: tbl.name,
         icon: <Table2 size={10} strokeWidth={1.5} />,
         expanded: isExp,
         expandable: true,
@@ -228,8 +244,8 @@ export function SchemaBrowser({
   );
 
   return (
-    // Suppress the browser's native context menu; a custom right-click menu
-    // (table actions: view, edit, drop…) will replace it later.
+    // Table rows have a custom right-click menu (below); suppress the browser's
+    // native menu everywhere else in the tree (keyspaces, columns, empty space).
     <div
       className="flex h-full flex-col bg-background"
       onContextMenu={(e) => e.preventDefault()}
@@ -262,9 +278,35 @@ export function SchemaBrowser({
             {keyspacesError}
           </div>
         )}
-        {rows.map((r, i) => (
-          <TreeRow key={i} row={r} />
-        ))}
+        {rows.map((r, i) =>
+          r.kind === "tbl" && r.ks && r.tableName ? (
+            <ContextMenu key={i}>
+              <ContextMenuTrigger asChild>
+                <div>
+                  <TreeRow row={r} />
+                </div>
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem onSelect={() => onViewRows(r.ks!, r.tableName!)}>
+                  <Table2 size={12} strokeWidth={1.6} />
+                  View first 100 rows
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem
+                  onSelect={() => {
+                    void navigator.clipboard.writeText(`${r.ks}.${r.tableName}`);
+                    toast.success("Copied name");
+                  }}
+                >
+                  <Copy size={12} strokeWidth={1.6} />
+                  Copy name
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
+          ) : (
+            <TreeRow key={i} row={r} />
+          ),
+        )}
         {keyspaces && rows.length === 0 && filter && (
           <div className="px-3 py-2 text-[11.5px] text-muted-foreground">
             No keyspaces match &quot;{filter}&quot;.

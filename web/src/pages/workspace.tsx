@@ -865,8 +865,9 @@ export function WorkspacePage() {
     setTabs((ts) => {
       const next = ts.filter((t) => t.id !== id);
       if (next.length === 0) {
-        seqRef.current += 1;
-        const blank = blankTab(seqRef.current);
+        // Closing the only tab resets to a fresh "query #1" (don't keep climbing).
+        seqRef.current = 1;
+        const blank = blankTab(1);
         setActiveTabId(blank.id);
         return [blank];
       }
@@ -1026,6 +1027,7 @@ export function WorkspacePage() {
             onToggleKs={onToggleKs}
             onToggleTbl={onToggleTbl}
             onSelectTable={onSelectTable}
+            onViewRows={viewRows}
             onRefresh={loadKeyspaces}
           />
         </div>
