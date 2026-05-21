@@ -1,0 +1,17 @@
+# Build artifacts
+/dist/
+/web/node_modules/
+/web/webfs/dist/
+
+# But keep an empty placeholder so go:embed compiles cleanly
+!/web/webfs/dist/.gitkeep
+
+# Local data
+/data/
+
+# OS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/

@@ -1,0 +1,199 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* shadcn/ui — new-york style, dark mode, zinc neutrals
+   Ported verbatim from the design handoff tokens.css.            */
+@layer base {
+  :root {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 5%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 142 60% 45%;
+    --warning: 38 92% 55%;
+    --info: 217 91% 60%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 70%;
+    --radius: 0.3rem;
+
+    --panel: 240 6% 6%;
+    --panel-2: 240 6% 8%;
+    --border-strong: 240 4% 22%;
+  }
+
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(240 4% 18%);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 5px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(240 4% 26%);
+    background-clip: padding-box;
+    border: 2px solid transparent;
+  }
+
+  ::selection {
+    background: hsl(0 0% 98% / 0.18);
+  }
+}
+
+@layer components {
+  .mono {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  /* Skeleton shimmer */
+  .skel {
+    background: linear-gradient(
+      90deg,
+      hsl(240 4% 14%) 0%,
+      hsl(240 4% 20%) 40%,
+      hsl(240 4% 14%) 80%
+    );
+    background-size: 200px 100%;
+    background-repeat: no-repeat;
+    border-radius: 3px;
+    @apply animate-shimmer;
+  }
+
+  /* Status dots */
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex: none;
+  }
+  .dot-green {
+    background: hsl(var(--success));
+    box-shadow: 0 0 0 3px hsl(var(--success) / 0.18);
+  }
+  .dot-red {
+    background: hsl(var(--destructive));
+    box-shadow: 0 0 0 3px hsl(var(--destructive) / 0.18);
+  }
+  .dot-amber {
+    background: hsl(var(--warning));
+    box-shadow: 0 0 0 3px hsl(var(--warning) / 0.18);
+  }
+  .dot-grey {
+    background: hsl(240 5% 40%);
+    box-shadow: 0 0 0 3px hsl(240 5% 40% / 0.18);
+  }
+
+  /* Caret blink for fake editor */
+  .caret {
+    display: inline-block;
+    width: 1px;
+    height: 1.1em;
+    background: hsl(var(--foreground));
+    vertical-align: text-bottom;
+    @apply animate-caret;
+  }
+
+  /* CQL syntax highlighting tokens */
+  .tk-kw {
+    color: hsl(330 80% 70%);
+  }
+  .tk-fn {
+    color: hsl(190 80% 65%);
+  }
+  .tk-str {
+    color: hsl(140 50% 65%);
+  }
+  .tk-num {
+    color: hsl(28 90% 65%);
+  }
+  .tk-id {
+    color: hsl(0 0% 92%);
+  }
+  .tk-type {
+    color: hsl(260 60% 75%);
+  }
+  .tk-c {
+    color: hsl(240 5% 45%);
+    font-style: italic;
+  }
+  .tk-pn {
+    color: hsl(240 5% 60%);
+  }
+
+  /* PK markers in grids */
+  .pk-pill {
+    color: hsl(38 92% 65%);
+  }
+  .ck-pill {
+    color: hsl(190 80% 65%);
+  }
+  .reg-pill {
+    color: hsl(240 5% 50%);
+  }
+
+  /* Focus rings — shadcn style */
+  :where(.ring-focus, input, textarea, button):focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--ring) / 0.4);
+  }
+
+  /* Compact keyboard key cap */
+  .kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10.5px;
+    font-weight: 500;
+    background: hsl(240 4% 12%);
+    border: 1px solid hsl(var(--border-strong));
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    color: hsl(var(--muted-foreground));
+  }
+}

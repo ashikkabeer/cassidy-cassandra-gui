@@ -1,0 +1,12 @@
+# Keep the Docker build context lean + correct. The frontend stage rebuilds
+# web/webfs/dist and the backend stage overlays it, so never ship a stale copy.
+.git
+.github
+dist/
+data/
+web/node_modules/
+web/webfs/dist/
+*.md
+.DS_Store
+.vscode/
+.idea/
