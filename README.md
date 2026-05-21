@@ -138,3 +138,29 @@ too (same CQL protocol).
 For the full system documentation — architecture, request lifecycle, data model,
 security model, REST API reference, frontend internals, and packaging (with
 diagrams) — see **[DESIGN.md](./DESIGN.md)**.
+
+## Set up locally with an AI coding agent
+
+Paste this into Claude Code (or any AI agent) from the repo root:
+
+```text
+Set up "Cassidy" (this repo — a self-hostable web GUI for Cassandra/ScyllaDB)
+locally. Read README.md + DESIGN.md, then ASK ME before running anything:
+
+1. Run mode: native binary (best for dev / VPN clusters) · Docker · docker-compose
+   (with a throwaway Cassandra) · dev hot-reload (`make dev`)?
+2. Cluster: existing (give contact points + port) or spin up a throwaway one?
+3. Reachability: VPN-only internal IPs · host localhost · public/same-Docker-net?
+   (VPN-only ⇒ use the NATIVE binary; Docker Desktop can't see VPN routes.)
+4. Cluster auth: username/password? TLS / CA / client cert?
+5. HTTP port (default 8080; else set CASSIDY_LISTEN_ADDR=:PORT).
+
+Then, per my answers: check prereqs (Go 1.25+, Node 22 + pnpm, Docker) and offer
+to install missing ones; build/run via the Makefile (native: `make build` →
+`CASSIDY_LISTEN_ADDR=:PORT CASSIDY_DATA_DIR=./data ./dist/cassidy`; `make docker`
+/ `make compose` / `make dev`; in compose use host `cassandra:9042`); wait for
+`GET /healthz` = 200; get the one-time SETUP TOKEN from the logs and walk me
+through /first-run; then help me add the connection, Test, and run a query.
+Remind me to back up `data/master.key` and set CASSIDY_COOKIE_SECURE=true behind
+HTTPS. Never commit secrets or `data/`; if a build fails, fix the root cause.
+```
