@@ -2,6 +2,7 @@
 /dist/
 /web/node_modules/
 /web/webfs/dist/
+/web/tsconfig.tsbuildinfo
 
 # But keep an empty placeholder so go:embed compiles cleanly
 !/web/webfs/dist/.gitkeep
