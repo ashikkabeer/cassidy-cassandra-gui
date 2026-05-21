@@ -44,6 +44,9 @@
   body,
   #root {
     height: 100%;
+    /* Stop horizontal trackpad overscroll from triggering the browser's
+       back/forward swipe — scrolling a wide results grid shouldn't navigate away. */
+    overscroll-behavior-x: none;
   }
 
   body {

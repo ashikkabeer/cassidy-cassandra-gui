@@ -77,7 +77,7 @@ export function DataGrid({
       {/* Single scroll container so the header scrolls horizontally in lockstep
           with the rows; the header stays pinned vertically via `sticky top-0`.
           `w-max min-w-full` makes header + rows share one width so columns align. */}
-      <div className="relative flex-1 overflow-auto">
+      <div className="relative flex-1 overflow-auto overscroll-x-contain">
         <div className="sticky top-0 z-[2] flex w-max min-w-full border-b bg-panel text-[11px] text-muted-foreground">
           <div className="w-9 shrink-0 border-r py-1 text-center">#</div>
           {columns.map((c) => (
