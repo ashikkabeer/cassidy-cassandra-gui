@@ -1,8 +1,23 @@
 import * as React from "react";
-import { KeyRound, Zap, ChevronUp, ChevronDown, Lock } from "lucide-react";
+import { KeyRound, Zap, ChevronUp, ChevronDown, Lock, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export type PkKind = "pk" | "ck" | null;
+
+// If the string parses as a JSON object/array, return it pretty-printed; else null.
+// Used by the cell inspector to format JSON stored in text/varchar columns.
+function tryFormatJSON(s: string): string | null {
+  const t = s.trim();
+  if (!(t.startsWith("{") || t.startsWith("["))) return null;
+  try {
+    return JSON.stringify(JSON.parse(t), null, 2);
+  } catch {
+    return null;
+  }
+}
 
 export interface GridColumn {
   name: string;
@@ -72,6 +87,18 @@ export function DataGrid({
   onCellBlur,
 }: DataGridProps) {
   const rowH = compact ? 26 : 32;
+
+  // Cell value inspector — double-click any cell to see/copy its full value
+  // (handy for long JSON stored in text/varchar columns).
+  const [peek, setPeek] = React.useState<{ col: string; type: string; value: string } | null>(null);
+  const [formatted, setFormatted] = React.useState(true);
+  const [copied, setCopied] = React.useState(false);
+  const openPeek = (col: string, type: string, value: string) => {
+    setPeek({ col, type, value });
+    setFormatted(true);
+    setCopied(false);
+  };
+
   return (
     <div className="flex h-full flex-col bg-background">
       {/* Single scroll container so the header scrolls horizontally in lockstep
@@ -141,6 +168,8 @@ export function DataGrid({
                     onClick={() => {
                       if (colEditable && !isDel) onCellClick?.(i, c.name);
                     }}
+                    onDoubleClick={() => openPeek(c.name, c.type, v == null ? "" : String(v))}
+                    title="Double-click to view full value"
                     style={{ width: c.width ?? 140 }}
                     className={cn(
                       "relative flex shrink-0 items-center border-r px-2",
@@ -204,6 +233,56 @@ export function DataGrid({
           );
         })}
       </div>
+
+      <Dialog open={!!peek} onOpenChange={(o) => !o && setPeek(null)}>
+        {peek &&
+          (() => {
+            const pretty = tryFormatJSON(peek.value);
+            const isJson = pretty !== null;
+            const shown = isJson && formatted ? pretty! : peek.value;
+            return (
+              <DialogContent
+                width={680}
+                title={peek.col}
+                subtitle={`${peek.type}${isJson ? " · JSON" : ""} · ${peek.value.length} chars`}
+                footer={
+                  <>
+                    {isJson && (
+                      <Button variant="outline" size="sm" onClick={() => setFormatted((f) => !f)}>
+                        {formatted ? "Raw" : "Formatted"}
+                      </Button>
+                    )}
+                    <span className="flex-1" />
+                    <Button
+                      size="sm"
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(shown);
+                        setCopied(true);
+                        toast.success("Copied value");
+                        setTimeout(() => setCopied(false), 1500);
+                      }}
+                    >
+                      {copied ? <Check size={12} strokeWidth={2} /> : <Copy size={12} strokeWidth={1.6} />}
+                      {copied ? "Copied" : "Copy"}
+                    </Button>
+                  </>
+                }
+              >
+                {peek.value === "" ? (
+                  <div className="text-[12px] italic text-muted-foreground">(empty / null)</div>
+                ) : (
+                  <textarea
+                    readOnly
+                    value={shown}
+                    spellCheck={false}
+                    onFocus={(e) => e.currentTarget.select()}
+                    className="mono h-[55vh] w-full resize-none rounded-[var(--radius)] border bg-panel p-2.5 text-[12px] leading-[1.5] outline-none"
+                  />
+                )}
+              </DialogContent>
+            );
+          })()}
+      </Dialog>
     </div>
   );
 }
