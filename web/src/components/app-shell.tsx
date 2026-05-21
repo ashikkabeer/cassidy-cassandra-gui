@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { Kbd } from "@/components/primitives";
 import { useActiveConnectionDetail } from "@/lib/active-connection-data";
 import { useAuth } from "@/lib/auth-store";
+import { listConnections } from "@/lib/connections";
 
 // Derive avatar initials (up to 2 chars) from a username like "ashik" → "AS".
 function initialsOf(name: string): string {
@@ -84,6 +85,25 @@ export function Sidebar({ active = "workspace", collapsed = false }: SidebarProp
   const user = useAuth((s) => s.user);
   const name = user?.username ?? "—";
   const role = user?.role ? user.role[0].toUpperCase() + user.role.slice(1) : "";
+
+  // Live count of the user's saved connections for the sidebar badge. Refetched
+  // when the Sidebar mounts (i.e. on each navigation between pages).
+  const [connCount, setConnCount] = React.useState<number | null>(null);
+  React.useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const list = await listConnections();
+        if (!cancelled) setConnCount((list ?? []).length);
+      } catch {
+        /* leave badge hidden if it fails */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <aside
       className={cn(
@@ -130,7 +150,7 @@ export function Sidebar({ active = "workspace", collapsed = false }: SidebarProp
           label="Connections"
           to="/connections"
           active={active === "connections"}
-          badge="4"
+          badge={connCount ? String(connCount) : undefined}
           collapsed={collapsed}
         />
         <NavItem
