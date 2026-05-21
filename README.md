@@ -11,6 +11,20 @@ schema browser with reconstructed DDL · CodeMirror CQL editor with schema-aware
 autocomplete, paging, CSV/JSON export, and query history · spreadsheet-style row
 editing that previews the exact `BEGIN BATCH … APPLY BATCH;` before committing.
 
+## Contents
+
+- [Quick start (Docker)](#quick-start-docker)
+  - [Try it with a throwaway Cassandra](#try-it-with-a-throwaway-cassandra)
+- [First run](#first-run)
+- [Connecting to Cassandra](#connecting-to-cassandra)
+  - [Networking: VPN-routed or host-local clusters](#networking-vpn-routed-or-host-local-clusters)
+- [Environment variables](#environment-variables)
+- [⚠ Back up your master key](#-back-up-your-master-key)
+- [Upgrading](#upgrading)
+- [Build from source](#build-from-source)
+- [Architecture](#architecture)
+- [Set up locally with an AI coding agent](#set-up-locally-with-an-ai-coding-agent)
+
 ## Quick start (Docker)
 
 ```sh
