@@ -1,5 +1,7 @@
 # Cassidy — self-hostable web GUI for Cassandra
 
+![Cassidy workspace — schema browser, CQL editor, and live results grid](docs/screenshots/workspace.png)
+
 Cassidy is a pgAdmin-style web GUI for Apache Cassandra & ScyllaDB. It ships as a
 **single static Go binary** with the React UI embedded — point it at your own
 cluster, browse the schema, run CQL, and edit rows. Multi-user with local
